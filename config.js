@@ -4,4 +4,5 @@
 
 // TO THIS:
 window.TMDB_KEY = "5bb55a61a689bcdff56feac522d401aa"; 
-window.YOUTUBE_KEY = "AIzaSyCxClq8_YDxMRvdJIcSeUaMXoNU2EIof3U";
+window.YOUTUBE_KEY = "AIzaSyDboSxT-hm2PwhcbC8cO8M2eQLguJZVVv0";
+
