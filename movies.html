@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Movies</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="config.js"></script> </head>
+<body>
+  <h1 id="heroName">Movies</h1>
+  <div id="movies" class="movie-grid"></div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const personId = urlParams.get('personId');
+    const type = urlParams.get('type');
+    const apiKey = window.TMDB_KEY; // Modified to use global variable
+
+    async function loadMovies() {
+      if(!personId || !type) return;
+
+      const url = `https://api.themoviedb.org/3/person/${personId}/movie_credits?api_key=${apiKey}&language=en-US`;
+      const response = await fetch(url);
+      const data = await response.json();
+
+      const heroName = type.charAt(0).toUpperCase() + type.slice(1);
+      document.getElementById("heroName").textContent = `${heroName} Movies`;
+
+      const moviesDiv = document.getElementById("movies");
+      moviesDiv.innerHTML = '';
+
+      let moviesList = [];
+      if(type === 'director') {
+        moviesList = data.crew.filter(movie => movie.job === "Director");
+      } else {
+        moviesList = data.cast;
+      }
+
+      // Sort movies by release date descending
+      moviesList.sort((a, b) => (b.release_date || '').localeCompare(a.release_date || ''));
+
+      moviesList.forEach(movie => {
+        const card = document.createElement("div");
+        card.className = "movie-card";
+        card.innerHTML = `
+          <a href="movie.html?movieId=${movie.id}">
+            <img src="${movie.poster_path ? 'https://image.tmdb.org/t/p/w200' + movie.poster_path : 'https://via.placeholder.com/200x300?text=No+Image'}" alt="${movie.title}">
+            <h3>${movie.title} (${movie.release_date ? movie.release_date.split("-")[0] : "N/A"})</h3>
+          </a>
+        `;
+        moviesDiv.appendChild(card);
+      });
+
+      if(moviesList.length === 0){
+        moviesDiv.innerHTML = `<p>No movies found for this ${type}.</p>`;
+      }
+    }
+
+    loadMovies();
+  </script>
+</body>
+</html>

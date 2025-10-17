@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Movie Details</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="config.js"></script> 
+</head>
+<body>
+  <div id="movie-detail" class="movie-detail-container"></div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const movieId = urlParams.get('movieId');
+    const tmdbKey = window.TMDB_KEY; 
+    // YOUTUBE_KEY is no longer needed in this file!
+
+    const ottLinks = {
+      "Netflix": "https://www.netflix.com/in/",
+      "Amazon Prime Video": "https://www.primevideo.com/",
+      "Disney Plus": "https://www.disneyplus.com/",
+      "Hotstar": "https://www.hotstar.com/in",
+      "Sony LIV": "https://www.sonyliv.com/",
+      "ZEE5": "https://www.zee5.com/",
+      "Apple TV+": "https://tv.apple.com/",
+      "HBO Max": "https://www.hbomax.com/",
+      "Voot": "https://www.voot.com/"
+    };
+
+    // NEW FUNCTION: Gets video links directly from TMDB's video endpoint
+    // This prioritizes Teaser/Trailer/Glimpse without using the YouTube quota.
+    async function getTMDBVideoLink(movieId) {
+      // Fetching videos directly from TMDB
+      const videosResponse = await fetch(`https://api.themoviedb.org/3/movie/${movieId}/videos?api_key=${tmdbKey}`);
+      const videosData = await videosResponse.json();
+
+      if (!videosData.results) return null;
+
+      // Define priority order for video types (Teaser, Trailer, Glimpse)
+      const priority = ['Glimpse', 'Teaser', 'Trailer', 'Clip', 'Featurette'];
+
+      // Find the best available video based on the priority list
+      for (const type of priority) {
+          const video = videosData.results.find(v => v.site === "YouTube" && v.type === type && v.official === true);
+          if (video) {
+              return { 
+                  link: `https://www.youtube.com/watch?v=${video.key}`, 
+                  text: `Watch Official ${video.type}` // e.g., Watch Official Glimpse
+              };
+          }
+      }
+      
+      // Fallback: Return the first available YouTube video if no official link is found
+      const fallbackVideo = videosData.results.find(v => v.site === "YouTube");
+      if (fallbackVideo) {
+          return {
+              link: `https://www.youtube.com/watch?v=${fallbackVideo.key}`,
+              text: `Watch Video`
+          };
+      }
+
+      return null;
+    }
+
+    async function loadMovieDetails() {
+      // 1. Fetch main details, credits, providers
+      const detailResponse = await fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${tmdbKey}&language=en-US`);
+      const movie = await detailResponse.json();
+
+      const creditsResponse = await fetch(`https://api.themoviedb.org/3/movie/${movieId}/credits?api_key=${tmdbKey}&language=en-US`);
+      const credits = await creditsResponse.json();
+
+      const providersResponse = await fetch(`https://api.themoviedb.org/3/movie/${movieId}/watch/providers?api_key=${tmdbKey}`);
+      const providersData = await providersResponse.json();
+
+      const directors = credits.crew.filter(c => c.job === "Director").map(c => c.name).join(", ");
+      const music = credits.crew.filter(c => c.job === "Original Music Composer").map(c => c.name).join(", ");
+      const cast = credits.cast.slice(0,10).map(c => c.name).join(", ");
+
+      // 2. Fetch video link using the new TMDB-based function
+      const youtubeInfo = await getTMDBVideoLink(movieId);
+
+      let ottHTML = "Not available on OTT";
+      if (providersData.results && providersData.results.IN && providersData.results.IN.flatrate) {
+        ottHTML = providersData.results.IN.flatrate.map(o => {
+          const url = ottLinks[o.provider_name] || "#";
+          return `<a href="${url}" target="_blank">${o.provider_name}</a>`;
+        }).join(", ");
+      }
+
+      document.getElementById("movie-detail").innerHTML = `
+        <h1>${movie.title} (${movie.release_date ? movie.release_date.split("-")[0] : ""})</h1>
+        <img class="poster" src="${movie.poster_path ? 'https://image.tmdb.org/t/p/w300'+movie.poster_path : 'https://via.placeholder.com/300x450?text=No+Image'}" alt="${movie.title}">
+        <p><strong>Overview:</strong> ${movie.overview || "No description available."}</p>
+        <p><strong>Genres:</strong> ${movie.genres.map(g => g.name).join(", ")}</p>
+        <p><strong>Director:</strong> ${directors || "N/A"}</p>
+        <p><strong>Music:</strong> ${music || "N/A"}</p>
+        <p><strong>Cast:</strong> ${cast || "N/A"}</p>
+        <p><strong>YouTube:</strong> ${youtubeInfo ? `<a href="${youtubeInfo.link}" target="_blank">${youtubeInfo.text}</a>` : "No official video found"}</p>
+        <p><strong>OTT Platforms:</strong> ${ottHTML}</p>
+      `;
+    }
+
+    loadMovieDetails();
+  </script>
+</body>
+</html>

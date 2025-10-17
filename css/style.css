@@ -1,0 +1,185 @@
+/* Reset and base styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #121212; /* Dark background */
+  color: #e0e0e0; /* Light text color for contrast */
+  line-height: 1.6;
+  transition: background-color 0.5s ease-in-out, color 0.5s ease-in-out;
+}
+
+header {
+  background-color: #1f1f1f; /* Slightly lighter dark header */
+  color: #fff;
+  text-align: center;
+  padding: 2.5rem 1rem;
+  border-bottom: 2px solid #333;
+}
+
+header h1 {
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+header p {
+  font-style: italic;
+  font-size: 1rem;
+  color: #b0b0b0;
+}
+
+/* Buttons on index.html */
+.button-container {
+  display: flex;
+  justify-content: center;
+  gap: 25px; /* Increased gap for better spacing */
+  flex-wrap: wrap;
+  margin: 2rem 0;
+}
+
+.button-container button {
+  padding: 12px 24px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  background-color: #2c3e50; /* A dark blue-gray accent */
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.button-container button:hover {
+  background-color: #34495e; /* Darker hover state */
+  transform: translateY(-3px); /* Lift effect */
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Hero/Heroines/Directors grids */
+.hero-grid, .movie-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Slightly larger min-width */
+  gap: 25px;
+  margin: 25px;
+}
+
+.hero-card, .movie-card {
+  background-color: #1f1f1f; /* Dark card background */
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  text-align: center;
+  transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  cursor: pointer;
+}
+
+.hero-card:hover, .movie-card:hover {
+  transform: translateY(-8px) scale(1.02); /* More pronounced lift and slight scale */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); /* Stronger shadow on hover */
+}
+
+.hero-card img, .movie-card img {
+  width: 100%;
+  height: 280px; /* Increased height for better aspect ratio */
+  object-fit: cover;
+  transition: transform 0.5s ease-in-out;
+}
+
+.hero-card img:hover, .movie-card img:hover {
+  transform: scale(1.05); /* Zoom effect on image hover */
+}
+
+.hero-card h3, .movie-card h3 {
+  font-size: 1.1rem;
+  margin: 15px 10px;
+  color: #fff;
+}
+
+.hero-card a, .movie-card a {
+  display: inline-block;
+  margin-bottom: 15px;
+  padding: 8px 16px;
+  background-color: #34495e;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.hero-card a:hover, .movie-card a:hover {
+  background-color: #4b6584; /* Lighter hover state for the link */
+  transform: scale(1.05);
+}
+
+/* movie.html specific */
+.movie-detail-container {
+  max-width: 900px;
+  margin: 2rem auto;
+  background-color: #1f1f1f;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  transition: box-shadow 0.5s ease-in-out;
+}
+
+.movie-detail-container img.poster {
+  display: block;
+  margin: 0 auto 25px auto;
+  width: 320px;
+  height: 480px;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  transition: transform 0.4s ease-in-out;
+}
+
+.movie-detail-container img.poster:hover {
+  transform: scale(1.03);
+}
+
+.movie-detail-container h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 2.5rem;
+  color: #fff;
+}
+
+.movie-detail-container p {
+  margin-bottom: 15px;
+  font-size: 1.1rem;
+  color: #ccc;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .hero-card img, .movie-card img {
+    height: 220px;
+  }
+
+  .movie-detail-container img.poster {
+    width: 250px;
+    height: 375px;
+  }
+}
+
+@media (max-width: 480px) {
+  .button-container {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .hero-card img, .movie-card img {
+    height: 200px;
+  }
+
+  .movie-detail-container img.poster {
+    width: 200px;
+    height: 300px;
+  }
+}
