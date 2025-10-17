@@ -1,3 +1,7 @@
-// Example of config.js to commit publicly:
-window.TMDB_KEY = "YOUR_PUBLIC_TMDB_API_KEY_HERE"; 
-window.YOUTUBE_KEY = "YOUR_PUBLIC_YOUTUBE_API_KEY_HERE";
+// Change this:
+// window.TMDB_KEY = "PLACEHOLDER_FOR_GITHUB";
+// window.YOUTUBE_KEY = "PLACEHOLDER_FOR_GITHUB";
+
+// TO THIS:
+window.TMDB_KEY = "5bb55a61a689bcdff56feac522d401aa"; 
+window.YOUTUBE_KEY = "AIzaSyCxClq8_YDxMRvdJIcSeUaMXoNU2EIof3U";
