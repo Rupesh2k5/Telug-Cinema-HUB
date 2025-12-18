@@ -1,23 +1,231 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Telugu Cinema Hub</title>
-  <link rel="stylesheet" href="css/style.css">
-  <script src="config.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TFI Cinemagic | Mana Cinema Mana Pride</title>
+<link rel="icon" type="image/jpg" href="images.jpg">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family: Arial, Helvetica, sans-serif;
+  background:#0b0f1a;
+  color:#fff;
+  line-height:1.6;
+}
+
+
+nav{
+  position:sticky;
+  top:0;
+  background:#000;
+  padding:15px 30px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  z-index:1000;
+  border-bottom:2px solid gold;
+}
+nav .logo{
+  font-size:1.5rem;
+  font-weight:bold;
+  color:gold;
+}
+nav .menu a{
+  color:#fff;
+  text-decoration:none;
+  margin-left:20px;
+  font-weight:bold;
+}
+nav .menu a:hover{color:gold}
+
+.hero{
+  min-height:90vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  background:linear-gradient(135deg,#000428,#004e92);
+  padding:40px 20px;
+}
+.hero h1{
+  font-size:3rem;
+  color:gold;
+}
+.hero p{
+  max-width:800px;
+  margin-top:15px;
+  font-size:1.2rem;
+}
+.dialogue{
+  margin-top:30px;
+  font-size:1.4rem;
+  color:#ffd700;
+  animation:fade 6s infinite;
+}
+@keyframes fade{
+  0%,100%{opacity:0}
+  20%,80%{opacity:1}
+}
+
+.buttons{
+  margin-top:30px;
+}
+.btn{
+  display:inline-block;
+  margin:10px;
+  padding:12px 25px;
+  background:gold;
+  color:#000;
+  text-decoration:none;
+  border-radius:25px;
+  font-weight:bold;
+}
+.btn:hover{background:#fff}
+
+.section{
+  padding:60px 20px;
+  text-align:center;
+}
+.section h2{
+  color:gold;
+  margin-bottom:30px;
+}
+.cards{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:20px;
+  max-width:1100px;
+  margin:auto;
+}
+.card{
+  background:#141a2f;
+  padding:25px;
+  border-radius:15px;
+}
+.card h3{color:gold;margin-bottom:10px}
+
+.era{background:#101624}
+
+.dedication{
+  background:#000;
+  border-top:3px solid gold;
+}
+
+footer{
+  background:#000;
+  padding:20px;
+  text-align:center;
+  font-size:.9rem;
+  color:#aaa;
+}
+
+@media(max-width:768px){
+  nav{flex-direction:column}
+  nav .menu{margin-top:10px}
+  .hero h1{font-size:2.3rem}
+}
+</style>
 </head>
+
 <body>
-  <header>
-    <h1>Welcome to Telugu Cinema Hub</h1>
-    <p>"Where every Telugu film has a story and every star has a legacy"</p>
-  </header>
-  <main>
-    <div class="button-container">
-      <button onclick="location.href='heroes.html'">Heroes</button>
-      <button onclick="location.href='heroines.html'">Heroines</button>
-      <button onclick="location.href='directors.html'">Directors</button>
-      <button onclick="location.href='comedian.html'">Comedians</button>
-  </main>
+<nav>
+  <div class="logo">TFI Cinemagic 🎬</div>
+  <div class="menu">
+    <a href="heroes.html">Heroes</a>
+    <a href="heroines.html">Heroines</a>
+    <a href="comedians.html">Comedians</a>
+    <a href="directors.html">Directors</a>
+    <a href="music-directors.html">Music Directors</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <h1>Mana Cinema, Mana Abhimaanam</h1>
+  <p>
+    This is not just a website.  
+    Idi mana Telugu Film Industry ki digital paalabhishekam.
+  </p>
+
+  <div class="dialogue">
+    🔥 “TFI ante brand kaadu… emotion ra!” 🔥
+  </div>
+
+  <div class="buttons">
+    <a href="heroes.html" class="btn">🔥 Mana Heroes</a>
+    <a href="heroines.html" class="btn">✨ Golden Heroines</a>
+    <a href="comedian.html" class="btn">😂 Comedy Kings</a>
+    <a href="directors.html" class="btn">🎥 Visionary Directors</a>
+    <a href="classics.html" class="btn">🎞️ Evergreen Classics</a>
+    <a href="pride.html" class="btn">👑 Pride of Telugu Cinema</a>
+  </div>
+</section>
+
+<!-- Endhuku -->
+<section class="section">
+  <h2>Why TFI Cinemagic? 💥</h2>
+  <div class="cards">
+    <div class="card">
+      <h3>Pure Telugu Identity</h3>
+      <p>No Hollywood noise. Only mana Telugu cinema pride.</p>
+    </div>
+    <div class="card">
+      <h3>Mass + Class</h3>
+      <p>From Mayabazar to Baahubali – complete journey.</p>
+    </div>
+    <div class="card">
+      <h3>Paisa Vasool</h3>
+      <p>Movies, posters, trailers, cast & OTT links.</p>
+    </div>
+    <div class="card">
+      <h3>Fan Made Tribute</h3>
+      <p>Built by a fan, for fans. With love for TFI.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ERA -->
+<section class="section era">
+  <h2>TFI Journey 🕰️</h2>
+  <div class="cards">
+    <div class="card">
+      <h3>1940s–60s</h3>
+      <p>Legends built the foundation.</p>
+    </div>
+    <div class="card">
+      <h3>1970s–90s</h3>
+      <p>Golden era of mass & emotion.</p>
+    </div>
+    <div class="card">
+      <h3>2000s–2010s</h3>
+      <p>Star power & commercial domination.</p>
+    </div>
+    <div class="card">
+      <h3>2020s</h3>
+      <p>Content-driven & pan-India reach.</p>
+    </div>
+  </div>
+</section>
+
+<!-- DEDICATION -->
+<section class="section dedication">
+  <h2>Dedicated to Telugu Film Industry 🙏</h2>
+  <p style="max-width:800px;margin:auto">
+    This is the Website made as a small tribute for Telugu Film Industry.
+    Legends, artists, fans - All made TFI into an Emotion.
+    Also This website included all the artists from other Industry (because for tfi fans don't have any language barrier).
+    <br><br>
+    <strong>TFI forever. Mana cinema forever. 💛</strong>
+  </p>
+  <strong>So no FANWARS</strong>
+</section>
+
+<footer>
+  © 2025 TFI Cinemagic | Built with ❤️ for Telugu Cinema Lovers
+</footer>
+
 </body>
+
 </html>
