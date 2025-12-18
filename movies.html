@@ -5,58 +5,90 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Movies</title>
   <link rel="stylesheet" href="css/style.css">
-  <script src="config.js"></script> </head>
+  <link rel="icon" type="image/jpg" href="images.jpg">
+  <script src="config.js"></script>
+</head>
 <body>
-  <h1 id="heroName">Movies</h1>
-  <div id="movies" class="movie-grid"></div>
 
-  <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const personId = urlParams.get('personId');
-    const type = urlParams.get('type');
-    const apiKey = window.TMDB_KEY; // Modified to use global variable
+<h1 id="heroName">Movies</h1>
+<div class="movies-grid" id="movies"></div>
 
-    async function loadMovies() {
-      if(!personId || !type) return;
+<script>
+const params = new URLSearchParams(window.location.search);
+const personId = params.get("personId");
+const type = params.get("type");
+const apiKey = window.TMDB_KEY;
+const MUSIC_JOBS = [
+  "Original Music Composer",
+  "Music",
+  "Music Director",
+  "Composer",
+  "Original Score",
+  "Score",
+  "Sound",
+  "Songs"
+];
 
-      const url = `https://api.themoviedb.org/3/person/${personId}/movie_credits?api_key=${apiKey}&language=en-US`;
-      const response = await fetch(url);
-      const data = await response.json();
 
-      const heroName = type.charAt(0).toUpperCase() + type.slice(1);
-      document.getElementById("heroName").textContent = `${heroName} Movies`;
+async function loadMovies() {
+  if (!personId || !type) return;
 
-      const moviesDiv = document.getElementById("movies");
-      moviesDiv.innerHTML = '';
+  const res = await fetch(
+    `https://api.themoviedb.org/3/person/${personId}/movie_credits?api_key=${apiKey}&language=en-US`
+  );
+  const data = await res.json();
 
-      let moviesList = [];
-      if(type === 'director') {
-        moviesList = data.crew.filter(movie => movie.job === "Director");
-      } else {
-        moviesList = data.cast;
-      }
+  let moviesList = [];
+  let titleText = "";
 
-      // Sort movies by release date descending
-      moviesList.sort((a, b) => (b.release_date || '').localeCompare(a.release_date || ''));
+  if (type === "director") {
+    moviesList = data.crew.filter(m => m.job === "Director");
+    titleText = "Directed Movies";
+  } 
+  else if (type === "music") {
+    moviesList = data.crew.filter(
+      m => MUSIC_JOBS.includes(m.job)
+    );
+    titleText = "Music Composed Movies";
+  } 
+  else {
+    moviesList = data.cast;
+    titleText = "Movies";
+  }
 
-      moviesList.forEach(movie => {
-        const card = document.createElement("div");
-        card.className = "movie-card";
-        card.innerHTML = `
-          <a href="movie.html?movieId=${movie.id}">
-            <img src="${movie.poster_path ? 'https://image.tmdb.org/t/p/w200' + movie.poster_path : 'https://via.placeholder.com/200x300?text=No+Image'}" alt="${movie.title}">
-            <h3>${movie.title} (${movie.release_date ? movie.release_date.split("-")[0] : "N/A"})</h3>
-          </a>
-        `;
-        moviesDiv.appendChild(card);
-      });
+  document.getElementById("heroName").innerText = titleText;
 
-      if(moviesList.length === 0){
-        moviesDiv.innerHTML = `<p>No movies found for this ${type}.</p>`;
-      }
-    }
+  moviesList.sort(
+    (a, b) => (b.release_date || "").localeCompare(a.release_date || "")
+  );
 
-    loadMovies();
-  </script>
+  const container = document.getElementById("movies");
+  container.innerHTML = "";
+
+  if (moviesList.length === 0) {
+    container.innerHTML = `<p>No movies found.</p>`;
+    return;
+  }
+
+  moviesList.forEach(movie => {
+    const div = document.createElement("div");
+    div.className = "movie-card";
+    div.innerHTML = `
+      <a href="movie.html?movieId=${movie.id}&type=${type}">
+        <img src="${
+          movie.poster_path
+            ? 'https://image.tmdb.org/t/p/w200' + movie.poster_path
+            : 'https://via.placeholder.com/200x300?text=No+Image'
+        }">
+        <h3>${movie.title} (${movie.release_date ? movie.release_date.split("-")[0] : "N/A"})</h3>
+      </a>
+    `;
+    container.appendChild(div);
+  });
+}
+
+loadMovies();
+</script>
+
 </body>
 </html>
