@@ -4,17 +4,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Movie Details</title>
+  <link rel="icon" type="image/jpg" href="images.jpg">
   <link rel="stylesheet" href="css/style.css">
-  <script src="config.js"></script> 
+  <script src="config.js"></script>
 </head>
 <body>
+
   <div id="movie-detail" class="movie-detail-container"></div>
 
   <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const movieId = urlParams.get('movieId');
-    const tmdbKey = window.TMDB_KEY; 
-    // YOUTUBE_KEY is no longer needed in this file!
+    const params = new URLSearchParams(window.location.search);
+    const movieId = params.get("movieId");
+    const type = params.get("type");
+    const tmdbKey = window.TMDB_KEY;
 
     const ottLinks = {
       "Netflix": "https://www.netflix.com/in/",
@@ -28,77 +30,153 @@
       "Voot": "https://www.voot.com/"
     };
 
-    // NEW FUNCTION: Gets video links directly from TMDB's video endpoint
-    // This prioritizes Teaser/Trailer/Glimpse without using the YouTube quota.
     async function getTMDBVideoLink(movieId) {
-      // Fetching videos directly from TMDB
-      const videosResponse = await fetch(`https://api.themoviedb.org/3/movie/${movieId}/videos?api_key=${tmdbKey}`);
-      const videosData = await videosResponse.json();
+      const res = await fetch(
+        `https://api.themoviedb.org/3/movie/${movieId}/videos?api_key=${tmdbKey}`
+      );
+      const data = await res.json();
+      if (!data.results) return null;
 
-      if (!videosData.results) return null;
+      const priority = ["Glimpse", "Teaser", "Trailer", "Clip", "Featurette"];
 
-      // Define priority order for video types (Teaser, Trailer, Glimpse)
-      const priority = ['Glimpse', 'Teaser', 'Trailer', 'Clip', 'Featurette'];
-
-      // Find the best available video based on the priority list
-      for (const type of priority) {
-          const video = videosData.results.find(v => v.site === "YouTube" && v.type === type && v.official === true);
-          if (video) {
-              return { 
-                  link: `https://www.youtube.com/watch?v=${video.key}`, 
-                  text: `Watch Official ${video.type}` // e.g., Watch Official Glimpse
-              };
-          }
-      }
-      
-      // Fallback: Return the first available YouTube video if no official link is found
-      const fallbackVideo = videosData.results.find(v => v.site === "YouTube");
-      if (fallbackVideo) {
+      for (const p of priority) {
+        const video = data.results.find(
+          v => v.site === "YouTube" && v.type === p && v.official === true
+        );
+        if (video) {
           return {
-              link: `https://www.youtube.com/watch?v=${fallbackVideo.key}`,
-              text: `Watch Video`
+            link: `https://www.youtube.com/watch?v=${video.key}`,
+            text: `Watch Official ${video.type}`
           };
+        }
+      }
+
+      const fallback = data.results.find(v => v.site === "YouTube");
+      if (fallback) {
+        return {
+          link: `https://www.youtube.com/watch?v=${fallback.key}`,
+          text: "Watch Video"
+        };
       }
 
       return null;
     }
 
     async function loadMovieDetails() {
-      // 1. Fetch main details, credits, providers
-      const detailResponse = await fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${tmdbKey}&language=en-US`);
-      const movie = await detailResponse.json();
+      const detailRes = await fetch(
+        `https://api.themoviedb.org/3/movie/${movieId}?api_key=${tmdbKey}&language=en-US`
+      );
+      const movie = await detailRes.json();
 
-      const creditsResponse = await fetch(`https://api.themoviedb.org/3/movie/${movieId}/credits?api_key=${tmdbKey}&language=en-US`);
-      const credits = await creditsResponse.json();
+      const creditsRes = await fetch(
+        `https://api.themoviedb.org/3/movie/${movieId}/credits?api_key=${tmdbKey}&language=en-US`
+      );
+      const credits = await creditsRes.json();
 
-      const providersResponse = await fetch(`https://api.themoviedb.org/3/movie/${movieId}/watch/providers?api_key=${tmdbKey}`);
-      const providersData = await providersResponse.json();
+      const providerRes = await fetch(
+        `https://api.themoviedb.org/3/movie/${movieId}/watch/providers?api_key=${tmdbKey}`
+      );
+      const providers = await providerRes.json();
 
       const directors = credits.crew.filter(c => c.job === "Director").map(c => c.name).join(", ");
       const music = credits.crew.filter(c => c.job === "Original Music Composer").map(c => c.name).join(", ");
-      const cast = credits.cast.slice(0,10).map(c => c.name).join(", ");
+      const cast = credits.cast.slice(0, 10).map(c => c.name).join(", ");
 
-      // 2. Fetch video link using the new TMDB-based function
-      const youtubeInfo = await getTMDBVideoLink(movieId);
+      const videoInfo = await getTMDBVideoLink(movieId);
 
       let ottHTML = "Not available on OTT";
-      if (providersData.results && providersData.results.IN && providersData.results.IN.flatrate) {
-        ottHTML = providersData.results.IN.flatrate.map(o => {
-          const url = ottLinks[o.provider_name] || "#";
-          return `<a href="${url}" target="_blank">${o.provider_name}</a>`;
+      if (providers.results && providers.results.IN && providers.results.IN.flatrate) {
+        ottHTML = providers.results.IN.flatrate.map(p => {
+          const url = ottLinks[p.provider_name] || "#";
+          return `<a href="${url}" target="_blank">${p.provider_name}</a>`;
         }).join(", ");
+      }
+
+      let songsHTML = "";
+      if (type === "music") {
+        songsHTML = `
+          <p><strong>Music Director:</strong> ${music || "N/A"}</p>
+          <p><strong>Songs:</strong></p>
+          <ul>
+            <li>Official soundtrack available on YouTube</li>
+            <li>Search: "${movie.title} Telugu full songs"</li>
+          </ul>
+          <p>
+            <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(movie.title + ' Telugu full songs')}" target="_blank">
+              ▶ Watch Songs on YouTube
+            </a>
+          </p>
+        `;
+      }
+
+      const CLASSIC_REASONS = {
+        "Mayabazar": "Revolutionary storytelling, mythological adaptation, and timeless performances.",
+        "Devadasu (1953)": "Iconic tragic romance that influenced Indian cinema across languages.",
+        "Pathala Bhairavi": "Fantasy folklore blended with music, drama, and evergreen appeal.",
+        "Gundamma Katha": "Strong female characters and social satire with family entertainment.",
+        "Sankarabharanam": "Revived classical Carnatic music in mainstream cinema.",
+        "Sagara Sangamam": "A landmark film blending dance, music, and deep emotion.",
+        "Daana Veera Soora Karna": "Mythological epic showcasing unmatched acting brilliance.",
+        "Swathi Muthyam": "Heart-touching portrayal of innocence and humanity.",
+        "Sirivennela": "Poetic storytelling with soulful music and emotional depth.",
+        "Misamma": "Classic comedy with subtle social commentary.",
+        "Alluri Seetharama Raju": "Patriotic biopic that ignited revolutionary spirit.",
+        "Shiva": "Game-changing film that redefined realism and action in Telugu cinema.",
+        "Geethanjali": "Romantic musical that became a cult classic for youth.",
+        "Khaidi": "Film that established the mass hero phenomenon.",
+        "Rudraveena": "Socially powerful cinema far ahead of its time.",
+        "Aditya 369": "Pioneering time-travel concept in Indian cinema.",
+        "Bhairava Dweepam": "Fantasy folklore enriched with grand visuals and storytelling.",
+        "Yamagola": "Mythological satire blended with comedy and social themes.",
+        "Pedarayudu": "Emotion-driven mass drama with strong moral core.",
+        "Gang Leader (1991)": "Stylish revenge drama that set trends in mass cinema.",
+        "SamaraSimha Reddy": "Film that popularized faction-based mass narratives.",
+        "Indra": "Industry hit defining leadership and mass appeal.",
+        "Jagadeka Veerudu Atiloka Sundari": "Timeless fantasy romance with universal appeal.",
+        "Major Chandrakanth": "Value-based drama emphasizing discipline and patriotism.",
+        "Hello Brother": "Comedy classic built on confusion and brilliant timing.",
+        "Nuvvu Naaku Nachav": "Evergreen family entertainer with clean humor.",
+        "Intlo Illalu Vantintlo Priyuralu": "Relatable middle-class family drama with humor.",
+        "TholiPrema (1998)": "Fresh portrayal of youth romance that changed love stories.",
+        "Anand": "Minimalistic love story celebrated for simplicity and realism.",
+        "Nuvve Kavali": "One-sided love story that defined early 2000s romance.",
+        "Khushi": "Romantic entertainer with iconic music and youth appeal.",
+        "Malliswari": "Classy romantic comedy with strong characterization.",
+        "Naa Autograph": "Nostalgic journey highlighting relationships and memories.",
+        "Godavari": "Feel-good romantic drama with scenic storytelling.",
+        "Happy Days": "Definitive college-life film for an entire generation.",
+        "Life is Beautiful": "Multi-narrative film celebrating hope and positivity.",
+        "Seethamma Vakitlo Sirimalle Chettu": "Modern portrayal of traditional joint family values.",
+        "Manam": "Emotionally rich family drama exploring rebirth and bonds.",
+        "Mahanati": "Biographical tribute redefining modern Telugu cinema.",
+        "Jersey": "Emotion-driven sports drama that inspired a new generation.",
+        "Ye Maya Chesave": "Realistic love story that became a romantic cult classic.",
+        "Pelli Choopulu": "New-age romance blending entrepreneurship and relationships."
+      };
+      let classicHTML = "";
+      if (type === "classic") {
+        classicHTML = `
+          <hr>
+          <p><strong>Why This Is a Classic:</strong></p>
+          <p>
+            ${CLASSIC_REASONS[movie.title] || 
+            "This film is considered a classic due to its cultural impact, storytelling excellence, and lasting influence on Telugu cinema."}
+          </p>
+        `;
       }
 
       document.getElementById("movie-detail").innerHTML = `
         <h1>${movie.title} (${movie.release_date ? movie.release_date.split("-")[0] : ""})</h1>
-        <img class="poster" src="${movie.poster_path ? 'https://image.tmdb.org/t/p/w300'+movie.poster_path : 'https://via.placeholder.com/300x450?text=No+Image'}" alt="${movie.title}">
+        <img class="poster" src="${movie.poster_path ? 'https://image.tmdb.org/t/p/w300' + movie.poster_path : 'https://via.placeholder.com/300x450?text=No+Image'}">
         <p><strong>Overview:</strong> ${movie.overview || "No description available."}</p>
         <p><strong>Genres:</strong> ${movie.genres.map(g => g.name).join(", ")}</p>
         <p><strong>Director:</strong> ${directors || "N/A"}</p>
         <p><strong>Music:</strong> ${music || "N/A"}</p>
         <p><strong>Cast:</strong> ${cast || "N/A"}</p>
-        <p><strong>YouTube:</strong> ${youtubeInfo ? `<a href="${youtubeInfo.link}" target="_blank">${youtubeInfo.text}</a>` : "No official video found"}</p>
+        <p><strong>YouTube:</strong> ${videoInfo ? `<a href="${videoInfo.link}" target="_blank">${videoInfo.text}</a>` : "No official video found"}</p>
         <p><strong>OTT Platforms:</strong> ${ottHTML}</p>
+        ${songsHTML}
+        ${classicHTML}
       `;
     }
 
