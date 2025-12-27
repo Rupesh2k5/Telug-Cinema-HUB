@@ -140,6 +140,7 @@ h2 {
   padding: 15px;
   text-align: center;
   transition: 0.3s;
+  cursor: pointer;
 }
 
 .movie-card img {
@@ -227,3 +228,4 @@ footer {
     height: 220px;
   }
 }
+
